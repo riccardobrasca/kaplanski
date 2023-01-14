@@ -1,0 +1,8 @@
+[package]
+name = "kaplanski"
+version = "0.1"
+lean_version = "leanprover-community/lean:3.50.3"
+path = "src"
+
+[dependencies]
+mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "23c61a3ca8d0bc8e9309e0128fb40936d7a2c806"}
