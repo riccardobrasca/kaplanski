@@ -59,12 +59,6 @@ begin
   contradiction,
 end
 
--- Already in the library (I don't know how to update the version of mathlib on my computer)
-theorem ideal.span_singleton_le_iff_mem (I : ideal R) {x : R} :
-ideal.span {x} ≤ I ↔ x ∈ I := submodule.span_singleton_le_iff_mem _ _
-theorem set.nonempty_iff_ne_empty {s : set R} :
-s.nonempty ↔ s ≠ ∅ := set.not_nonempty_iff_eq_empty.not_right
-
 -----------------------
 
 theorem mem_or_mem' : ∀ {x y : R}, x * y ∈ P → x ∈ P ∨ y ∈ P :=
@@ -83,8 +77,6 @@ begin
     apply h',
     rw [← hI, ← ideal.span_singleton_le_iff_mem _],
     exact le_sup_right,
-    exact hP,
-    exact hmax,
   end,
 
   have h₂ : P < J :=
@@ -94,8 +86,6 @@ begin
     apply h'',
     rw [← hJ, ← ideal.span_singleton_le_iff_mem _],
     exact le_sup_right,
-    exact hP,
-    exact hmax,
   end,
 
   have h₃ : (I : set R) ∩ S ≠ ∅ := 
@@ -141,10 +131,6 @@ begin
   end,
 
   contradiction,
-  exact hP,
-  exact hmax,
-  exact hP,
-  exact hmax,
 end
 
 theorem theo3 {x y : R} (h : x * y ∈ P) : P.is_prime :=
