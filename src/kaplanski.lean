@@ -10,11 +10,6 @@ def foo := {I : ideal R | (I : set R) ∩ S = ∅}
 lemma foo_def (P : ideal R) : P ∈ foo R S ↔ (P : set R) ∩ S = ∅ :=
 iff.rfl
 
-example : preorder (foo R S) :=
-begin
-  apply_instance
-end
-
 variables (P : ideal R) (hP : P ∈ foo R S) (hmax : ∀ I ∈ foo R S, P ≤ I → P = I)
 
 include hP hmax
