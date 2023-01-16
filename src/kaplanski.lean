@@ -14,33 +14,15 @@ variables (P : ideal R) (hP : P ∈ foo R S) (hmax : ∀ I ∈ foo R S, P ≤ I 
 
 include hP hmax
 
+variables (Q : Prop) (d₁ d₂ : Q)
+
+example : d₁ = d₂ := rfl
+
 theorem P_neq_top : P ≠ ⊤ :=
 begin
   intro h,
-  rw foo_def at hP,
-
-  have h₂ : 1 ∈ (P : set R) ∩ S :=
-  begin
-    rw set.mem_inter_iff _ _ _,
-    split,
-    {
-      rw ideal.eq_top_iff_one at h,
-      exact h,
-    },
-    {
-      exact submonoid.one_mem S,
-    },
-  end,
-
-  have h₃ : (P : set R) ∩ S ≠ ∅ := 
-  begin
-    intro h₄,
-    rw set.eq_empty_iff_forall_not_mem at h₄,
-    specialize h₄ 1,
-    contradiction,
-  end,
-
-  contradiction,
+  have h₂ : 1 ∈ (P : set R) ∩ S := ⟨(ideal.eq_top_iff_one _).1 h, submonoid.one_mem _⟩,
+  exact (λ h₄, (set.eq_empty_iff_forall_not_mem.1 h₄) 1 h₂) hP,
 end
 
 lemma gt_inter_S {I : ideal R} {h : P < I} : (I : set R) ∩ S ≠ ∅ :=
@@ -49,9 +31,7 @@ begin
   specialize hmax I,
   rw ← foo_def at h₂, 
   rw lt_iff_le_and_ne at h,
-  cases h with h₃ h₄,
-  have hmax₂ := hmax h₂ h₃,
-  contradiction,
+  exact h.2 (hmax h₂ h.1),
 end
 
 -----------------------
