@@ -3,20 +3,16 @@ import ring_theory.ideal.basic
 import ring_theory.ideal.operations
 import data.set.basic
 
-variables (R : Type*) [comm_ring R] (S : submonoid R)
+variables {R : Type*} [comm_ring R] (S : submonoid R)
 
 def foo := {I : ideal R | (I : set R) ∩ S = ∅}
 
-lemma foo_def (P : ideal R) : P ∈ foo R S ↔ (P : set R) ∩ S = ∅ :=
+lemma foo_def (P : ideal R) : P ∈ foo S ↔ (P : set R) ∩ S = ∅ :=
 iff.rfl
 
-variables (P : ideal R) (hP : P ∈ foo R S) (hmax : ∀ I ∈ foo R S, P ≤ I → P = I)
+variables {P : ideal R} {S} (hP : P ∈ foo S) (hmax : ∀ I ∈ foo S, P ≤ I → P = I)
 
 include hP hmax
-
-variables (Q : Prop) (d₁ d₂ : Q)
-
-example : d₁ = d₂ := rfl
 
 theorem P_neq_top : P ≠ ⊤ :=
 begin
@@ -25,7 +21,7 @@ begin
   exact (λ h₄, (set.eq_empty_iff_forall_not_mem.1 h₄) 1 h₂) hP,
 end
 
-lemma gt_inter_S {I : ideal R} {h : P < I} : (I : set R) ∩ S ≠ ∅ :=
+lemma gt_inter {I : ideal R} (h : P < I) : (I : set R) ∩ S ≠ ∅ :=
 begin
   intro h₂,
   specialize hmax I,
@@ -63,17 +59,9 @@ begin
     exact le_sup_right,
   end,
 
-  have h₃ : (I : set R) ∩ S ≠ ∅ := 
-  begin
-    refine gt_inter_S R S P hP hmax,
-    exact h₁,
-  end,
+  have h₃ : (I : set R) ∩ S ≠ ∅ := gt_inter hP hmax h₁,
 
-  have h₄ : (J : set R) ∩ S ≠ ∅ :=
-  begin
-    refine gt_inter_S R S P hP hmax,
-    exact h₂,
-  end,
+  have h₄ : (J : set R) ∩ S ≠ ∅ := gt_inter hP hmax h₂,
 
   rw [← set.nonempty_iff_ne_empty, set.inter_nonempty] at h₃,
   rw [← set.nonempty_iff_ne_empty, set.inter_nonempty] at h₄,
@@ -112,7 +100,7 @@ theorem theo3 {x y : R} (h : x * y ∈ P) : P.is_prime :=
 begin
   fconstructor,
   {
-    refine P_neq_top R S P hP hmax,
+    refine P_neq_top hP hmax,
   },
   {
    apply mem_or_mem',
