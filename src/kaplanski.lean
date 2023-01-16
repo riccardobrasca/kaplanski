@@ -108,3 +108,20 @@ begin
    exact hmax,
   },
 end
+
+section existence
+
+example : preorder (foo S) :=
+begin
+  apply_instance
+end
+
+omit hmax
+
+lemma prop_2 : ∃ P ∈ foo S,  ∀ I ∈ foo S, P ≤ I → P = I :=
+begin
+  obtain ⟨I, hImem, hI⟩ := zorn_preorder₀ (foo S) sorry,
+  exact ⟨I, ⟨hImem, λ J hJ hJI, le_antisymm hJI (hI J hJ hJI)⟩⟩,
+end
+
+end existence
