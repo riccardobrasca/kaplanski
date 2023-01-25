@@ -63,7 +63,7 @@ begin
   end,
 
   have h₁₁ : P * P ⊔ ideal.span {x} * P ⊔ (P * ideal.span {y} ⊔ ideal.span {x} * ideal.span {y}) ≤ P := sup_le (sup_le ideal.mul_le_right ideal.mul_le_left) (sup_le ideal.mul_le_right h₁₀),
-  
+
   have h₁₂ : s*t ∈ (P : set R) ∩ S := set.mem_inter (h₁₁ h₉) (submonoid.mul_mem S h₆ h₈),
 
   have h₁₃ : (P : set R) ∩ S ≠ ∅ := λ h₁₄, ((set.eq_empty_iff_forall_not_mem.1 h₁₄) (s*t)) h₁₂,
@@ -76,18 +76,18 @@ begin
   fconstructor,
   refine P_neq_top hP hmax,
   apply mem_or_mem',
-  exact hP, 
+  exact hP,
   exact hmax,
 end
 
 section existence
 
-omit hmax
+omit hP hmax
 
 lemma condition_Zorns_lemma : ∀ (C : set (ideal R)), C ⊆ foo S → is_chain has_le.le C → (∃ (P : ideal R) (H : P ∈ foo S), ∀ (z : ideal R), z ∈ C → z ≤ P) :=
 begin
   rintro C hC hC₂,
-  let f : C → ideal R := λ J, J, 
+  let f : C → ideal R := λ J, J,
   let I : ideal R := supr f,
   use I,
   split,
@@ -110,7 +110,7 @@ begin
     end,
 
     have hx₅ : J ∈ foo S := hC hJ₁,
-    
+
     contradiction, },
   { rintro z hz,
 
@@ -146,7 +146,7 @@ begin
       { rw set_like.coe_subset_coe.symm,
         rintro hy y,
         exact hy y, },
-    end,  
+    end,
 
     rw hz₃,
     intro y,
@@ -156,7 +156,7 @@ end
 
 lemma prop_2 : ∃ P ∈ foo S,  ∀ I ∈ foo S, P ≤ I → P = I :=
 begin
-  obtain ⟨I, hImem, hI⟩ := zorn_preorder₀ (foo S) (condition_Zorns_lemma hP),
+  obtain ⟨I, hImem, hI⟩ := zorn_preorder₀ (foo S) (condition_Zorns_lemma),
   exact ⟨I, ⟨hImem, λ J hJ hJI, le_antisymm hJI (hI J hJ hJI)⟩⟩,
 end
 
