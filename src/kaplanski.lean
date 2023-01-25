@@ -84,9 +84,9 @@ section existence
 
 omit hP hmax
 
-lemma condition_Zorns_lemma : ∀ (C : set (ideal R)), C ⊆ foo S → is_chain has_le.le C → (∃ (P : ideal R) (H : P ∈ foo S), ∀ (z : ideal R), z ∈ C → z ≤ P) :=
+lemma condition_Zorns_lemma (C : set (ideal R)) (hC : C ⊆ foo S) (hC₂ : is_chain (≤) C) :
+  ∃ (P : ideal R) (H : P ∈ foo S), ∀ (z : ideal R), z ∈ C → z ≤ P :=
 begin
-  rintro C hC hC₂,
   let f : C → ideal R := λ J, J,
   let I : ideal R := supr f,
   use I,
