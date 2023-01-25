@@ -98,7 +98,12 @@ begin
 
     have hx₃ : ∃ J ∈ C, x ∈ J :=
     begin
-      sorry,
+      haveI : nonempty C := sorry,
+      rw [set_like.mem_coe, submodule.mem_supr_of_directed] at hx₁,
+      { obtain ⟨⟨J, hJmem⟩, hJ⟩ := hx₁,
+        exact ⟨J, hJmem, hJ⟩ },
+      { rw [← directed_on_iff_directed],
+        refine is_chain.directed_on hC₂ }
     end,
     rcases hx₃ with ⟨J, ⟨hJ₁, hJ₂⟩⟩,
 
