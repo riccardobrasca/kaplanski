@@ -84,9 +84,10 @@ section existence
 
 omit hP hmax
 
-lemma condition_Zorns_lemma (C : set (ideal R)) (hC : C ⊆ foo S) (hC₂ : is_chain (≤) C) :
-  ∃ (P : ideal R) (H : P ∈ foo S), ∀ (z : ideal R), z ∈ C → z ≤ P :=
+lemma condition_Zorns_lemma :
+  ∀ (C : set (ideal R)), C ⊆ foo S → is_chain (≤) C → ∀ (y : ideal R), y ∈ C → (∃ (P : ideal R) (H : P ∈ foo S), ∀ (z : ideal R), z ∈ C → z ≤ P) :=
 begin
+  rintro C hC hC₂ hC₃ hC₄,
   let f : C → ideal R := λ J, J,
   let I : ideal R := supr f,
   use I,
@@ -159,10 +160,24 @@ begin
     exact ideal.mem_Sup_of_mem hz, },
 end
 
-lemma prop_2 : ∃ P ∈ foo S,  ∀ I ∈ foo S, P ≤ I → P = I :=
+lemma prop_2 (C : set (ideal R)) (hC : C ⊆ foo S) (hC₂ : is_chain (≤) C) (hC₃ : ∀ (y : ideal R), y ∈ C) (hS : (0 : R) ∉ S) : ∃ P ∈ foo S,  ∀ I ∈ foo S, P ≤ I → I = P :=
 begin
-  obtain ⟨I, hImem, hI⟩ := zorn_preorder₀ (foo S) (condition_Zorns_lemma),
-  exact ⟨I, ⟨hImem, λ J hJ hJI, le_antisymm hJI (hI J hJ hJI)⟩⟩,
+  let x : ideal R := 0,
+  have hx : x ∈ foo S :=
+  begin
+    rw [foo_def, set.eq_empty_iff_forall_not_mem],
+    rintro y hy,
+    have hx : x = 0 := rfl,
+    rw [hx, set.mem_inter_iff] at hy,
+    cases hy with hy₁ hy₂,
+    simp at hy₁,
+    rw hy₁ at hy₂,
+    exact hS hy₂,
+  end,
+  have h := zorn_nonempty_partial_order₀ (foo S) (condition_Zorns_lemma) x hx,
+  rcases h with ⟨J, ⟨hJ, ⟨hJ₂, hJ₃⟩⟩⟩,
+  use J,
+  refine ⟨hJ, hJ₃⟩,
 end
 
 end existence
