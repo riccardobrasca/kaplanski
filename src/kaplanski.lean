@@ -12,7 +12,7 @@ iff.rfl
 
 variables {P : ideal R} {S} (hP : P ∈ foo S) (hmax : ∀ I ∈ foo S, P ≤ I → P = I)
 
-include hP hmax
+include hP
 
 theorem P_neq_top : P ≠ ⊤ :=
 begin
@@ -21,7 +21,13 @@ begin
   exact (λ h₄, (set.eq_empty_iff_forall_not_mem.1 h₄) 1 h₂) hP,
 end
 
+include hmax
+
+omit hP
+
 lemma gt_inter {I : ideal R} (h : P < I) : (I : set R) ∩ S ≠ ∅ := λ h₂, (lt_iff_le_and_ne.1 h).2 ((hmax I) h₂ (lt_iff_le_and_ne.1 h).1)
+
+include hP
 
 theorem mem_or_mem' : ∀ {x y : R}, x * y ∈ P → x ∈ P ∨ y ∈ P :=
 begin
@@ -34,7 +40,7 @@ begin
 
   have h₁ : (I : set R) ∩ S ≠ ∅ :=
   begin
-    refine gt_inter hP hmax (lt_of_le_of_ne' le_sup_left _),
+    refine gt_inter hmax (lt_of_le_of_ne' le_sup_left _),
     intro hI,
     rw [← hI, ← ideal.span_singleton_le_iff_mem _] at h',
     exact h' le_sup_right,
@@ -42,7 +48,7 @@ begin
 
   have h₂ : (J : set R) ∩ S ≠ ∅ :=
   begin
-    refine gt_inter hP hmax (lt_of_le_of_ne' le_sup_left _),
+    refine gt_inter hmax (lt_of_le_of_ne' le_sup_left _),
     intro hJ,
     rw [← hJ, ← ideal.span_singleton_le_iff_mem _] at h'',
     exact h'' le_sup_right,
@@ -71,10 +77,10 @@ begin
   contradiction,
 end
 
-theorem theo3 {x y : R} (h : x * y ∈ P) : P.is_prime :=
+theorem theo3 : P.is_prime :=
 begin
   fconstructor,
-  refine P_neq_top hP hmax,
+  refine P_neq_top hP,
   apply mem_or_mem',
   exact hP,
   exact hmax,
@@ -84,7 +90,7 @@ section existence
 
 omit hP hmax
 
-lemma condition_Zorns_lemma (hS : (0 : R) ∉ S) (C : set (ideal R)) (hC : C ⊆ foo S)
+lemma condition_Zorns_lemma (C : set (ideal R)) (hC : C ⊆ foo S)
   (hC₂ : is_chain (≤) C) (I : ideal R) (hI : I ∈ C) :
   (∃ (P : ideal R) (H : P ∈ foo S), ∀ (J : ideal R), J ∈ C → J ≤ P) :=
 begin
@@ -100,8 +106,7 @@ begin
   exact hx₄ (hC hJ₁)
 end
 
-lemma prop_2 (C : set (ideal R)) (hC : C ⊆ foo S) (hC₂ : is_chain (≤) C)
-  (hS : (0 : R) ∉ S) : ∃ P ∈ foo S,  ∀ I ∈ foo S, P ≤ I → I = P :=
+lemma prop_2 (hS : (0 : R) ∉ S) : ∃ P ∈ foo S,  ∀ I ∈ foo S, P ≤ I → I = P :=
 begin
   set x : ideal R := 0 with hx,
   have hx : x ∈ foo S,
@@ -110,7 +115,7 @@ begin
     rw [hx, set_like.mem_coe, ideal.zero_eq_bot, ideal.mem_bot] at hy₁,
     rw hy₁ at hy₂,
     exact hS hy₂ },
-  rcases zorn_nonempty_partial_order₀ (foo S) (condition_Zorns_lemma hS) x hx with
+  rcases zorn_nonempty_partial_order₀ (foo S) condition_Zorns_lemma x hx with
     ⟨J, ⟨hJ, ⟨hJ₂, hJ₃⟩⟩⟩,
   exact ⟨J, hJ, hJ₃⟩,
 end
