@@ -84,7 +84,7 @@ section existence
 
 omit hP hmax
 
-lemma condition_Zorns_lemma :
+lemma condition_Zorns_lemma (hS : (0 : R) ∉ S) :
   ∀ (C : set (ideal R)), C ⊆ foo S → is_chain (≤) C → ∀ (y : ideal R), y ∈ C → (∃ (P : ideal R) (H : P ∈ foo S), ∀ (z : ideal R), z ∈ C → z ≤ P) :=
 begin
   rintro C hC hC₂ hC₃ hC₄,
@@ -93,31 +93,43 @@ begin
   use I,
   split,
   { by_contra,
-    rw [foo_def, ← set.not_nonempty_iff_eq_empty] at h,
-    push_neg at h,
-    rcases h with ⟨x, ⟨hx₁, hx₂⟩⟩,
+    by_cases h₂ : nonempty C,
+    { rw [foo_def, ← set.not_nonempty_iff_eq_empty] at h,
+      push_neg at h,
+      rcases h with ⟨x, ⟨hx₁, hx₂⟩⟩,
 
-    have hx₃ : ∃ J ∈ C, x ∈ J :=
-    begin
-      haveI : nonempty C := sorry,
-      rw [set_like.mem_coe, submodule.mem_supr_of_directed] at hx₁,
-      { obtain ⟨⟨J, hJmem⟩, hJ⟩ := hx₁,
-        exact ⟨J, hJmem, hJ⟩ },
-      { rw [← directed_on_iff_directed],
-        refine is_chain.directed_on hC₂ }
-    end,
-    rcases hx₃ with ⟨J, ⟨hJ₁, hJ₂⟩⟩,
+      have hx₃ : ∃ J ∈ C, x ∈ J :=
+      begin
+        resetI,
+        rw [set_like.mem_coe, submodule.mem_supr_of_directed] at hx₁,
+        { obtain ⟨⟨J, hJmem⟩, hJ⟩ := hx₁,
+          exact ⟨J, hJmem, hJ⟩ },
+        { rw [← directed_on_iff_directed],
+          refine is_chain.directed_on hC₂ }
+      end,
+      rcases hx₃ with ⟨J, ⟨hJ₁, hJ₂⟩⟩,
 
-    have hx₄ : (J : set R) ∩ S ≠ ∅ :=
-    begin
-      rw [← set.nonempty_iff_ne_empty, set.inter_nonempty],
-      use x,
-      refine ⟨hJ₂, hx₂⟩,
-    end,
+      have hx₄ : (J : set R) ∩ S ≠ ∅ :=
+      begin
+        rw [← set.nonempty_iff_ne_empty, set.inter_nonempty],
+        use x,
+        refine ⟨hJ₂, hx₂⟩,
+      end,
 
-    have hx₅ : J ∈ foo S := hC hJ₁,
+      have hx₅ : J ∈ foo S := hC hJ₁,
 
-    contradiction, },
+      contradiction, },
+    { apply h,
+      rw not_nonempty_iff at h₂,
+      resetI,
+      have h₃ : I = supr f := rfl,
+      rw [h₃, supr_of_empty f, foo_def, set.eq_empty_iff_forall_not_mem],
+      rintro h hx,
+      rw set.mem_inter_iff at hx,
+      cases hx with hx₁ hx₂,
+      rw [set_like.mem_coe, ideal.mem_bot] at hx₁,
+      rw hx₁ at hx₂,
+      exact hS hx₂, }, },
   { rintro z hz,
 
     have hz₂ : set.range f = C :=
@@ -170,11 +182,11 @@ begin
     have hx : x = 0 := rfl,
     rw [hx, set.mem_inter_iff] at hy,
     cases hy with hy₁ hy₂,
-    simp at hy₁,
+    rw [set_like.mem_coe, ideal.zero_eq_bot, ideal.mem_bot] at hy₁,
     rw hy₁ at hy₂,
     exact hS hy₂,
   end,
-  have h := zorn_nonempty_partial_order₀ (foo S) (condition_Zorns_lemma) x hx,
+  have h := zorn_nonempty_partial_order₀ (foo S) (condition_Zorns_lemma hS) x hx,
   rcases h with ⟨J, ⟨hJ, ⟨hJ₂, hJ₃⟩⟩⟩,
   use J,
   refine ⟨hJ, hJ₃⟩,
