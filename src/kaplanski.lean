@@ -14,9 +14,9 @@ iff.rfl
 
 variables {P : ideal R} {S} (hP : P ∈ foo S) (hmax : ∀ I ∈ foo S, P ≤ I → P = I)
 
-include hP
+section basic
 
-theorem P_neq_top : P ≠ ⊤ :=
+theorem P_neq_top (hP : P ∈ foo S) : P ≠ ⊤ :=
 begin
   intro h,
   have h₂ : 1 ∈ (P : set R) ∩ S := ⟨(ideal.eq_top_iff_one _).1 h, submonoid.one_mem _⟩,
@@ -24,8 +24,6 @@ begin
 end
 
 include hmax
-
-omit hP
 
 lemma gt_inter {I : ideal R} (h : P < I) : (I : set R) ∩ S ≠ ∅ := λ h₂, (lt_iff_le_and_ne.1 h).2 ((hmax I) h₂ (lt_iff_le_and_ne.1 h).1)
 
@@ -88,9 +86,9 @@ begin
   exact hmax,
 end
 
-section existence
+end basic
 
-omit hP hmax
+section existence
 
 lemma condition_Zorns_lemma (C : set (ideal R)) (hC : C ⊆ foo S)
   (hC₂ : is_chain (≤) C) (I : ideal R) (hI : I ∈ C) :
@@ -126,11 +124,16 @@ end existence
 
 section Kaplansky
 
-variables [cancel_comm_monoid_with_zero R]
+variables [is_domain R]
 
-omit hP hmax
+theorem theo1_droite [unique_factorization_monoid R] {I : ideal R} (hI : I ≠ 0) (hI₂ : I.is_prime) :
+  ∃ x ∈ I, prime x := sorry
 
-theorem theo1 : unique_factorization_monoid R ↔ ∀ (I : ideal R) (hI : I ≠ 0) (hI₂ : I.is_prime), ∃ (J : ideal R), J ≠ 0 → J.is_prime → submodule.is_principal (J : submodule R R) → J ≤ I :=
+theorem theo1_gauche : ∀ (I : ideal R) (hI : I ≠ 0) (hI₂ : I.is_prime), ∃ x ∈ I, prime x →
+  unique_factorization_monoid R := sorry
+
+theorem theo1' : unique_factorization_monoid R ↔
+  ∀ (I : ideal R) (hI : I ≠ 0) (hI₂ : I.is_prime), ∃ (J : ideal R), J ≠ 0 → J.is_prime → submodule.is_principal (J : submodule R R) → J ≤ I :=
 begin
   sorry,
 end
