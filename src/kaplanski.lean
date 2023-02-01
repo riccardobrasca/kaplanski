@@ -2,6 +2,8 @@ import algebra.module.submodule.lattice
 import ring_theory.ideal.basic
 import ring_theory.ideal.operations
 import data.set.basic
+import ring_theory.unique_factorization_domain
+import ring_theory.principal_ideal_domain
 
 variables {R : Type*} [comm_ring R] (S : submonoid R)
 
@@ -121,3 +123,16 @@ begin
 end
 
 end existence
+
+section Kaplansky
+
+variables [cancel_comm_monoid_with_zero R]
+
+omit hP hmax
+
+theorem theo1 : unique_factorization_monoid R ↔ ∀ (I : ideal R) (hI : I ≠ 0) (hI₂ : I.is_prime), ∃ (J : ideal R), J ≠ 0 → J.is_prime → submodule.is_principal (J : submodule R R) → J ≤ I :=
+begin
+  sorry,
+end
+
+end Kaplansky
