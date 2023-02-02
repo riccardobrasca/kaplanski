@@ -135,9 +135,9 @@ theorem theo1_gauche : ∀ (I : ideal R) (hI : I ≠ 0) (hI₂ : I.is_prime), �
 theorem theo1' : unique_factorization_monoid R ↔
   ∀ (I : ideal R) (hI : I ≠ 0) (hI₂ : I.is_prime), ∃ (J : ideal R), J ≠ 0 → J.is_prime → submodule.is_principal (J : submodule R R) → J ≤ I :=
 begin
-  refine ⟨λ h, _, _⟩,
-  { letI := h,
-
+  refine ⟨_, _⟩,
+  { introI h,
+    sorry
   },
   {
     sorry
