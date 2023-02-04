@@ -103,7 +103,7 @@ begin
   have hx₄ : (J : set R) ∩ S ≠ ∅,
   { rw [← set.nonempty_iff_ne_empty],
     exact ⟨x, hJ₂, hx₂⟩ },
-  exact hx₄ (hC hJ₁)
+  exact hx₄ (hC hJ₁),
 end
 
 lemma prop_2 (hS : (0 : R) ∉ S) : ∃ P ∈ foo S,  ∀ I ∈ foo S, P ≤ I → I = P :=
@@ -124,10 +124,48 @@ end existence
 
 section Kaplansky
 
-variables [is_domain R]
+variables [is_domain R] [decidable_eq R]
 
-theorem theo1_droite [unique_factorization_monoid R] {I : ideal R} (hI : I ≠ 0) (hI₂ : I.is_prime) :
-  ∃ x ∈ I, prime x := sorry
+lemma multiset.prod_mem_ideal [unique_factorization_monoid R] {I : ideal R} (s : multiset R) (hI : I.is_prime) : s.prod ∈ I ↔ ∃ (p : R) (H : p ∈ s), p ∈ I :=
+begin
+  split,
+  { intro hs,
+    by_contra,
+    push_neg at h,
+
+    have hs₃ : s.prod ∉ I,
+    refine multiset.prod_induction _ _ _ _ h,
+    { rintro a b ha hb,
+      by_contra,
+      cases ((ideal.is_prime_iff.1 hI).2) h with hI₂ hI₃,
+      exact ha hI₂,
+      exact hb hI₃, },
+    exact λ h₂, (ideal.is_prime_iff.1 hI).1 ((ideal.eq_top_iff_one _).2 h₂),
+
+    exact hs₃ hs, },
+  { intro hs,
+    rcases hs with ⟨p, ⟨hs₂, hs₃⟩⟩,
+    rw ← multiset.prod_erase hs₂,
+    exact ideal.mul_mem_right _ _ hs₃, },
+end
+
+theorem theo1_droite [unique_factorization_monoid R] {I : ideal R} (hI : nontrivial I) (hI₂ : I.is_prime) :
+  ∃ x ∈ I, prime x :=
+begin
+  have ha : ∃ (a : R), a ∈ I ∧ a ≠ 0,
+  cases exists_ne (0 : I) with y hI₃,
+  refine ⟨y, y.2, _⟩,
+  finish,
+
+  rcases ha with ⟨a, ⟨ha₁, ha₂⟩⟩,
+  cases (unique_factorization_monoid.factors_prod ha₂) with u ha₃,
+  rw ← ha₃ at ha₁,
+  cases ((ideal.is_prime.mem_or_mem hI₂) ha₁) with ha₄ ha₅,
+  { rcases ((multiset.prod_mem_ideal (unique_factorization_monoid.factors a) hI₂).1 ha₄) with ⟨p, ⟨ha₅, ha₆⟩⟩,
+    refine ⟨p, ha₆, unique_factorization_monoid.prime_of_factor p ha₅⟩, },
+  { exfalso,
+    exact (ideal.is_prime_iff.1 hI₂).1 (ideal.eq_top_of_is_unit_mem _ ha₅ (units.is_unit u)), },
+end
 
 theorem theo1_gauche : ∀ (I : ideal R) (hI : I ≠ 0) (hI₂ : I.is_prime), ∃ x ∈ I, prime x →
   unique_factorization_monoid R := sorry
