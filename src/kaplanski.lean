@@ -155,7 +155,8 @@ begin
   have ha : ∃ (a : R), a ∈ I ∧ a ≠ 0,
   cases exists_ne (0 : I) with y hI₃,
   refine ⟨y, y.2, _⟩,
-  finish,
+  rw [ne.def, subtype.ext_iff_val] at hI₃,
+  exact hI₃,
 
   rcases ha with ⟨a, ⟨ha₁, ha₂⟩⟩,
   cases (unique_factorization_monoid.factors_prod ha₂) with u ha₃,
