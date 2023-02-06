@@ -172,11 +172,36 @@ theorem theo1_gauche : ∀ (I : ideal R) (hI : I ≠ 0) (hI₂ : I.is_prime), �
   unique_factorization_monoid R := sorry
 
 theorem theo1' : unique_factorization_monoid R ↔
-  ∀ (I : ideal R) (hI : I ≠ 0) (hI₂ : I.is_prime), ∃ (J : ideal R), J ≠ 0 → J.is_prime → submodule.is_principal (J : submodule R R) → J ≤ I :=
+  ∀ (I : ideal R) (hI : nontrivial I) (hI₂ : I.is_prime), ∃ (J : ideal R), nontrivial J ∧ J.is_prime ∧ submodule.is_principal (J : submodule R R) ∧ J ≤ I :=
 begin
   refine ⟨_, _⟩,
   { introI h,
-    sorry
+    rintro I hI hI₂,
+    resetI,
+
+    have ha : ∃ (a : R), a ∈ I ∧ a ≠ 0,
+    cases exists_ne (0 : I) with y hI₃,
+    refine ⟨y, y.2, _⟩,
+    rw [ne.def, subtype.ext_iff_val] at hI₃,
+    exact hI₃,
+
+    rcases ha with ⟨a, ⟨ha₁, ha₂⟩⟩,
+    cases (unique_factorization_monoid.factors_prod ha₂) with u ha₃,
+    rw ← ha₃ at ha₁,
+    cases ((ideal.is_prime.mem_or_mem hI₂) ha₁) with ha₄ ha₅,
+    { rcases ((multiset.prod_mem_ideal (unique_factorization_monoid.factors a) hI₂).1 ha₄) with ⟨p, ⟨ha₅, ha₆⟩⟩,
+
+      have ha₇ := (unique_factorization_monoid.prime_of_factor p) ha₅,
+      have ha₈ := prime.ne_zero ha₇,
+
+      refine ⟨ideal.span {p}, _, (ideal.span_singleton_prime ha₈).2 ha₇, (submodule.is_principal_iff _).2 ⟨p, eq.symm ideal.submodule_span_eq⟩, (ideal.span_singleton_le_iff_mem _).2 ha₆⟩,
+
+      rw nontrivial_iff,
+      refine ⟨⟨(0 : R), ideal.zero_mem (ideal.span {p})⟩, ⟨p, ideal.mem_span_singleton_self _⟩, _⟩,
+      rw [ne.def, subtype.mk_eq_mk],
+      exact ne.symm ha₈, },
+    { exfalso,
+      exact (ideal.is_prime_iff.1 hI₂).1 (ideal.eq_top_of_is_unit_mem _ ha₅ (units.is_unit u)), },
   },
   {
     sorry
