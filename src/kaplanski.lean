@@ -168,8 +168,7 @@ begin
     exact (ideal.is_prime_iff.1 hI₂).1 (ideal.eq_top_of_is_unit_mem _ ha₅ (units.is_unit u)), },
 end
 
-theorem theo1_gauche : (∀ (I : ideal R) (hI : I ≠ 0) (hI₂ : I.is_prime), ∃ x ∈ I, prime x) →
-  unique_factorization_monoid R := sorry
+theorem theo1_gauche (H : ∀ (I : ideal R) (hI : I ≠ 0) (hI₂ : I.is_prime), ∃ x ∈ I, prime x) : unique_factorization_monoid R := sorry
 
 theorem theo1' : unique_factorization_monoid R ↔
   ∀ (I : ideal R) (hI : nontrivial I) (hI₂ : I.is_prime), ∃ (J : ideal R), nontrivial J ∧ J.is_prime ∧ submodule.is_principal (J : submodule R R) ∧ J ≤ I :=
