@@ -170,10 +170,56 @@ begin
     exact (ideal.is_prime_iff.1 hI₂).1 (ideal.eq_top_of_is_unit_mem _ ha₅ (units.is_unit u)), },
 end
 
+variable (R)
+
+def primes := {r : R | prime r}
+
+variable {R}
+
+lemma unique_factorization_monoid_of_factorization
+  (H : ∀ (r : R), r ≠ 0 → ¬(is_unit r) →  r ∈ submonoid.closure (primes R)) :
+  unique_factorization_monoid R :=
+begin
+  apply unique_factorization_monoid.of_exists_prime_factors,
+  intros a ha,
+  specialize H a ha,
+  by_cases  hu : is_unit a,
+  { use ∅,
+    split,
+    { intros b hb,
+      exfalso,
+      simpa using hb },
+    { simp,
+      rw [associated.comm],
+      exact associated_one_iff_is_unit.2 hu } },
+  { specialize H hu,
+    rcases submonoid.exists_multiset_of_mem_closure H with ⟨M, hM, hMprod⟩,
+    use M,
+    split,
+    { intros b hb,
+      exact hM b hb },
+    { rw [hMprod], } }
+end
+
 theorem theo1_gauche (H : ∀ (I : ideal R) (hI : I ≠ 0) (hI₂ : I.is_prime), ∃ x ∈ I, prime x) :
   unique_factorization_monoid R :=
 begin
-  sorry
+  let S := submonoid.closure (primes R),
+  have hzero : (0 : R) ∉ S,
+  { suffices : ∀ s ∈ S, s ≠ (0 : R),
+    { intro h,
+      specialize this 0 h,
+      contradiction },
+    intros s hs,
+    apply submonoid.closure_induction hs,
+    { intros x hx,
+      exact hx.ne_zero },
+    { exact ne_zero.ne 1 },
+    { intros x y hx hy,
+      exact mul_ne_zero hx hy } },
+  apply unique_factorization_monoid_of_factorization,
+  intros a ha haunit,
+  sorry,
 end
 
 theorem theo1' : unique_factorization_monoid R ↔
@@ -181,8 +227,7 @@ theorem theo1' : unique_factorization_monoid R ↔
 begin
   classical,
   refine ⟨_, _⟩,
-  { introI h,
-    rintro I hI hI₂,
+  { rintro h I hI hI₂,
     resetI,
 
     have ha : ∃ (a : R), a ∈ I ∧ a ≠ 0,
