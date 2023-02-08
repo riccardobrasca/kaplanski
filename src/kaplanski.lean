@@ -124,10 +124,11 @@ end existence
 
 section Kaplansky
 
-variables [is_domain R] [decidable_eq R]
+variables [is_domain R]
 
 lemma multiset.prod_mem_ideal [unique_factorization_monoid R] {I : ideal R} (s : multiset R) (hI : I.is_prime) : s.prod ∈ I ↔ ∃ (p : R) (H : p ∈ s), p ∈ I :=
 begin
+  classical,
   split,
   { intro hs,
     by_contra,
@@ -152,6 +153,7 @@ end
 theorem theo1_droite [unique_factorization_monoid R] {I : ideal R} (hI : nontrivial I) (hI₂ : I.is_prime) :
   ∃ x ∈ I, prime x :=
 begin
+  classical,
   have ha : ∃ (a : R), a ∈ I ∧ a ≠ 0,
   cases exists_ne (0 : I) with y hI₃,
   refine ⟨y, y.2, _⟩,
@@ -168,11 +170,16 @@ begin
     exact (ideal.is_prime_iff.1 hI₂).1 (ideal.eq_top_of_is_unit_mem _ ha₅ (units.is_unit u)), },
 end
 
-theorem theo1_gauche (H : ∀ (I : ideal R) (hI : I ≠ 0) (hI₂ : I.is_prime), ∃ x ∈ I, prime x) : unique_factorization_monoid R := sorry
+theorem theo1_gauche (H : ∀ (I : ideal R) (hI : I ≠ 0) (hI₂ : I.is_prime), ∃ x ∈ I, prime x) :
+  unique_factorization_monoid R :=
+begin
+  sorry
+end
 
 theorem theo1' : unique_factorization_monoid R ↔
   ∀ (I : ideal R) (hI : nontrivial I) (hI₂ : I.is_prime), ∃ (J : ideal R), nontrivial J ∧ J.is_prime ∧ submodule.is_principal (J : submodule R R) ∧ J ≤ I :=
 begin
+  classical,
   refine ⟨_, _⟩,
   { introI h,
     rintro I hI hI₂,
