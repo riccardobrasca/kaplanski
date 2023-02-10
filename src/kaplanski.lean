@@ -12,7 +12,7 @@ def foo := {I : ideal R | (I : set R) ∩ S = ∅}
 lemma foo_def (P : ideal R) : P ∈ foo S ↔ (P : set R) ∩ S = ∅ :=
 iff.rfl
 
-variables {P : ideal R} {S} (hP : P ∈ foo S) (hmax : ∀ I ∈ foo S, P ≤ I → P = I)
+variables {P : ideal R} {S} (hP : P ∈ foo S) (hmax : ∀ I ∈ foo S, P ≤ I → I = P)
 
 section basic
 
@@ -25,7 +25,7 @@ end
 
 include hmax
 
-lemma gt_inter {I : ideal R} (h : P < I) : (I : set R) ∩ S ≠ ∅ := λ h₂, (lt_iff_le_and_ne.1 h).2 ((hmax I) h₂ (lt_iff_le_and_ne.1 h).1)
+lemma gt_inter {I : ideal R} (h : P < I) : (I : set R) ∩ S ≠ ∅ := λ h₂, (lt_iff_le_and_ne.1 h).2 (eq.symm ((hmax I) h₂ (lt_iff_le_and_ne.1 h).1))
 
 include hP
 
@@ -219,7 +219,36 @@ begin
       exact mul_ne_zero hx hy } },
   apply unique_factorization_monoid_of_factorization,
   intros a ha haunit,
-  sorry,
+
+  have ha₂ : ideal.span {a} ∉ foo S,
+  by_contra,
+  rcases prop_2 hzero with ⟨P, ⟨hP, hP₂⟩⟩,
+
+  have hP₃ : P ≠ 0,
+  by_contra h₂,
+
+  have ha₂ : a ∈ ideal.span {a},
+  rw ideal.mem_span_singleton',
+  use 1,
+  rw one_mul,
+
+  rw [h₂, ideal.zero_eq_bot, ← ideal.span_zero] at hP₂,
+  rw [((hP₂ (ideal.span {a}) h) ((ideal.span_singleton_le_iff_mem (ideal.span {a})).2 (ideal.zero_mem (ideal.span {a})))), ideal.span_zero] at ha₂,
+  exact ha (ideal.mem_bot.1 ha₂),
+
+  rcases ((H P) hP₃ (theo3 hP hP₂)) with ⟨x, ⟨H₃, H₄⟩⟩,
+  have hx : x ∉ S,
+  by_contra h₂,
+  have h₃ : x ∈ (P : set R) ∩ S := ⟨(set_like.mem_coe.1 H₃), (set_like.mem_coe.1 h₂)⟩,
+  rw (foo_def _ _).1 hP at h₃,
+  exact (set.mem_empty_iff_false x).1 h₃,
+
+  exact hx ((submonoid.closure_singleton_le_iff_mem _ _).1 (submonoid.closure_mono (set.singleton_subset_iff.2 H₄))),
+
+  rw [foo_def, ← ne.def] at ha₂,
+  rcases set.nonempty_iff_ne_empty.2 ha₂ with ⟨x, ⟨hx, hx₂⟩⟩,
+  cases ideal.mem_span_singleton'.1 (set_like.mem_coe.1 hx) with b hb,
+  rw ← hb at hx₂,
 end
 
 theorem theo1' : unique_factorization_monoid R ↔
