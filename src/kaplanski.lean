@@ -201,6 +201,44 @@ begin
     { rw [hMprod], } }
 end
 
+lemma submonoid.closure_exists_multiset {x : R} (hx : x ∈ submonoid.closure (primes R)): (∃ (n : ℕ) (f : multiset R) (hf : f.card = n + 1), (∀ (y : R), y ∈ f → prime y) ∧ x = f.prod) ∨ x = 1 :=
+begin
+  apply submonoid.closure_induction hx _ _,
+
+  rintro x y h₁ h₂,
+  rcases h₁ with ⟨n, ⟨f₁, hf₁, ⟨hf₂, hf₃⟩⟩⟩,
+  rcases h₂ with ⟨m, ⟨g₁, hg₁, ⟨hg₂, hg₃⟩⟩⟩,
+  use n + m + 1,
+  use f₁ + g₁,
+  refine ⟨_, λ y hy, _, _⟩,
+  rw [multiset.card_add _ _, hf₁, hg₁],
+  ring,
+  cases multiset.mem_add.1 hy with hy₁ hy₂,
+  exact hf₂ y hy₁,
+  exact hg₂ y hy₂,
+  rw [multiset.prod_add _ _, hf₃, hg₃],
+
+  left,
+  rw [h₂, mul_one _],
+  exact ⟨n, f₁, hf₁, hf₂, hf₃⟩,
+
+  rw [h₁, one_mul _],
+  rcases h₂ with ⟨m, ⟨g₁, hg₁, ⟨hg₂, hg₃⟩⟩⟩,
+  left,
+  exact ⟨m, g₁, hg₁, hg₂, hg₃⟩,
+  right,
+  exact h₂,
+
+  rintro z hz,
+  left,
+  refine ⟨0, {z}, multiset.card_singleton _, λ y hy, _, eq.symm (multiset.prod_singleton _)⟩,
+  rw ← multiset.mem_singleton.1 hy at hz,
+  exact hz,
+
+  right,
+  refl,
+end
+
 theorem theo1_gauche (H : ∀ (I : ideal R) (hI : I ≠ 0) (hI₂ : I.is_prime), ∃ x ∈ I, prime x) :
   unique_factorization_monoid R :=
 begin
@@ -249,6 +287,28 @@ begin
   rcases set.nonempty_iff_ne_empty.2 ha₂ with ⟨x, ⟨hx, hx₂⟩⟩,
   cases ideal.mem_span_singleton'.1 (set_like.mem_coe.1 hx) with b hb,
   rw ← hb at hx₂,
+
+  cases submonoid.closure_exists_multiset hx₂ with hab hab₂,
+  rcases hab with ⟨n, f, hf, ⟨hf₂, hab⟩⟩,
+  induction n with d hd generalizing f b x,
+  {
+    rw zero_add at hf,
+    cases multiset.card_eq_one.1 hf with y hy,
+    rw [hy, multiset.prod_singleton _] at hab,
+    rw hy at hf₂,
+    have hf₃ := prime.irreducible (hf₂ y (multiset.mem_singleton_self _)),
+    rw ← hab at hf₃,
+    cases of_irreducible_mul hf₃,
+    sorry,
+    sorry
+  },
+  {
+    sorry,
+  },
+
+  exfalso,
+  rw mul_comm at hab₂,
+  exact haunit (is_unit_of_mul_eq_one _ _ hab₂),
 end
 
 theorem theo1' : unique_factorization_monoid R ↔
