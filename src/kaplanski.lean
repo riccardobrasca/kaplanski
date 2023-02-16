@@ -296,11 +296,23 @@ begin
     cases multiset.card_eq_one.1 hf with y hy,
     rw [hy, multiset.prod_singleton _] at hab,
     rw hy at hf₂,
-    have hf₃ := prime.irreducible (hf₂ y (multiset.mem_singleton_self _)),
+    specialize hf₂ y (multiset.mem_singleton_self _),
+    have hf₃ := prime.irreducible hf₂,
     rw ← hab at hf₃,
     cases of_irreducible_mul hf₃,
-    sorry,
-    sorry
+
+    rw mul_comm _ _ at hab,
+    have hab₂ : associated y (y * ring.inverse b),
+    use ring.inverse b,
+    exact b,
+    exact ring.inverse_mul_cancel _ h,
+    exact ring.mul_inverse_cancel _ h,
+    refl,
+    rw ← (ring.eq_mul_inverse_iff_mul_eq _ _ _ h).2 hab at hab₂,
+    exact submonoid.subset_closure ((hab₂.prime_iff).1 hf₂),
+
+    exfalso,
+    exact haunit h,
   },
   {
     sorry,
