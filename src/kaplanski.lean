@@ -315,6 +315,37 @@ begin
     exact haunit h,
   },
   {
+    classical,
+    by_cases h : ∃ (p : R), p ∈ f ∧ p ∣ b,
+
+    rcases h with ⟨p, ⟨hp₁, hp₂⟩⟩,
+    cases dvd_iff_exists_eq_mul_left.1 hp₂ with c hp₂,
+    rw [hp₂, ← multiset.prod_erase hp₁, mul_comm c p, mul_assoc _ _ _] at hab,
+    replace hab := is_domain.mul_left_cancel_of_ne_zero (prime.ne_zero (hf₂ p hp₁)) hab,
+    have ha₃ : (f.erase p).prod ∈ (ideal.span {a}) :=
+    begin
+      rw ← hab,
+      rw ideal.mem_span_singleton',
+      use c,
+    end,
+    have ha₄ : c * a ∈ ↑S :=
+    begin
+      rw [submonoid.closure_eq_image_prod _, set.mem_image _ _ _],
+      refine ⟨((f.erase p).to_list), set.mem_set_of.1 (λ y hy, hf₂ y (multiset.mem_of_le (f.erase_le p) (multiset.mem_to_list.1 hy))), _⟩,
+      rw multiset.prod_to_list _,
+      exact eq.symm hab,
+    end,
+    have ha₅ : multiset.card (f.erase p) = d + 1 := sorry,
+    have ha₆ : ∀ (y : R), y ∈ f.erase p → prime y := λ y hy, hf₂ y ((multiset.mem_of_le (multiset.erase_le _ _)) hy),
+    exact hd (f.erase p) c (f.erase p).prod ha₃ hab ha₄ ha₅ ha₆ hab,
+
+    have ha₇ : f.prod ∣ a :=
+    begin
+      refine multiset.prod_primes_dvd _ hf₂ _ _,
+      rintro p hp,
+      sorry,
+      sorry,
+    end,
     sorry,
   },
 
