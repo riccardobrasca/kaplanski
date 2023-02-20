@@ -3,12 +3,12 @@ import data.polynomial.erase_lead
 
 variables {R : Type*} [comm_ring R]
 
-open_locale polynomial
+open_locale polynomial big_operators
 
-theorem is_unit_of_is_unit_add_is_nilpotent {r s : R} (hu : is_unit r) (hnil : is_unit s) :
-  is_unit (r + s) :=
+theorem is_unit_of_is_unit_add_is_nilpotent {u r : R} (hu : is_unit u) (hnil : is_nilpotent r) :
+  is_unit (u + r) :=
 begin
-  sorry
+sorry
 end
 
 namespace polynomial
