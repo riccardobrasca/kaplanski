@@ -16,12 +16,7 @@ variables {P : ideal R} {S} (hP : P ∈ foo S) (hmax : ∀ I ∈ foo S, P ≤ I 
 
 section basic
 
-theorem P_neq_top (hP : P ∈ foo S) : P ≠ ⊤ :=
-begin
-  intro h,
-  have h₂ : 1 ∈ (P : set R) ∩ S := ⟨(ideal.eq_top_iff_one _).1 h, submonoid.one_mem _⟩,
-  exact (λ h₄, (set.eq_empty_iff_forall_not_mem.1 h₄) 1 h₂) hP,
-end
+theorem P_neq_top (hP : P ∈ foo S) : P ≠ ⊤ := λ h, ((set.disjoint_left.1 (set.disjoint_iff_inter_eq_empty.2 ((foo_def _ _).1 hP))) (P.eq_top_iff_one.1 h)) S.one_mem
 
 include hmax
 
