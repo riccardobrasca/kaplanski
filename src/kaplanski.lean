@@ -4,6 +4,7 @@ import ring_theory.ideal.operations
 import data.set.basic
 import ring_theory.unique_factorization_domain
 import ring_theory.principal_ideal_domain
+import import absorbing
 
 variables {R : Type*} [comm_ring R] (S : submonoid R)
 
@@ -150,6 +151,51 @@ variable (R)
 
 def primes := {r : R | prime r}
 
+lemma primes_mem_mul : (submonoid.closure (primes R)).absorbing :=
+begin
+  -- classical,
+  -- obtain ⟨m, hm⟩ := subsemigroup.exists_multiset_of_mem_closure h,
+  -- revert hm a b,
+  -- apply multiset.strong_induction_on m,
+  -- rintros s hind b a hab ⟨hprime, hprod⟩,
+  -- simp at *,
+  sorry,
+  -- rcases multiset.empty_or_exists_mem s with (hempty | ⟨i, hi⟩),
+  -- { simp [hempty] at hprod,
+  --   refine ⟨1, submonoid.one_mem _, _⟩,
+  --   rw [associated_one_iff_is_unit],
+  --   exact is_unit_of_mul_eq_one a b (eq.symm hprod) },
+  -- rw [← multiset.cons_erase hi, multiset.prod_cons] at hprod,
+  -- rcases (hprime i hi).dvd_or_dvd ⟨(s.erase i).prod, hprod.symm⟩ with (⟨x, hxa⟩ | ⟨x, hxb⟩),
+  -- { suffices : ∃ z ∈ submonoid.closure (primes R), associated x z,
+  --   { obtain ⟨z, hz, hzx⟩ := this,
+  --     refine ⟨z * i, submonoid.mul_mem _ hz (submonoid.subset_closure (hprime _ hi)), _⟩,
+  --     rw [hxa, mul_comm z i],
+  --     exact associated.mul_left i hzx },
+  --   rw [hxa, mul_assoc, mul_eq_mul_left_iff] at hprod,
+  --   cases hprod,
+  --   { have hxbmem : x * b ∈ submonoid.closure (primes R),
+  --     { rw [← hprod],
+  --       refine submonoid.multiset_prod_mem _ _ (λ x hx, submonoid.subset_closure (hprime _ _)),
+  --       exact multiset.erase_subset _ _ hx },
+  --     obtain ⟨z, hz⟩ := hind (s.erase i) (multiset.erase_lt.2 hi) hxbmem
+  --       (λ y hy, hprime _ (multiset.erase_subset _ _ hy)) hprod,
+  --     exact ⟨z, hz.1, hz.2⟩ },
+  --   { exfalso,
+  --     exact (hprime _ hi).ne_zero hprod } },
+  -- { rw [hxb, ← mul_assoc, mul_comm a i, mul_assoc, mul_eq_mul_left_iff] at hprod,
+  --   cases hprod,
+  --   { have haxmem : a * x ∈ submonoid.closure (primes R),
+  --     { rw [← hprod],
+  --       refine submonoid.multiset_prod_mem _ _ (λ x hx, submonoid.subset_closure (hprime _ _)),
+  --       exact multiset.erase_subset _ _ hx },
+  --     obtain ⟨z, hz⟩ := hind (s.erase i) (multiset.erase_lt.2 hi) haxmem
+  --       (λ y hy, hprime _ (multiset.erase_subset _ _ hy)) hprod,
+  --     refine ⟨z, hz.1, hz.2⟩ },
+  --   { exfalso,
+  --     exact (hprime _ hi).ne_zero hprod } }
+end
+
 variable {R}
 
 lemma unique_factorization_monoid_of_factorization
@@ -231,103 +277,39 @@ begin
     { exact ne_zero.ne 1 },
     { intros x y hx hy,
       exact mul_ne_zero hx hy } },
-  apply unique_factorization_monoid_of_factorization,
-  intros a ha haunit,
+  refine unique_factorization_monoid.of_exists_prime_factors (λ a ha, _),
 
   have ha₂ : ideal.span {a} ∉ foo S,
-  by_contra,
-  rcases prop_2 hzero with ⟨P, ⟨hP, hP₂⟩⟩,
-
-  have hP₃ : P ≠ 0,
-  by_contra h₂,
-
-  have ha₂ : a ∈ ideal.span {a},
-  rw ideal.mem_span_singleton',
-  use 1,
-  rw one_mul,
-
-  rw [h₂, ideal.zero_eq_bot, ← ideal.span_zero] at hP₂,
-  rw [((hP₂ (ideal.span {a}) h) ((ideal.span_singleton_le_iff_mem (ideal.span {a})).2 (ideal.zero_mem (ideal.span {a})))), ideal.span_zero] at ha₂,
-  exact ha (ideal.mem_bot.1 ha₂),
-
-  rcases ((H P) hP₃ (theo3 hP hP₂)) with ⟨x, ⟨H₃, H₄⟩⟩,
-  have hx : x ∉ S,
-  by_contra h₂,
-  have h₃ : x ∈ (P : set R) ∩ S := ⟨(set_like.mem_coe.1 H₃), (set_like.mem_coe.1 h₂)⟩,
-  rw (foo_def _ _).1 hP at h₃,
-  exact (set.mem_empty_iff_false x).1 h₃,
-
-  exact hx ((submonoid.closure_singleton_le_iff_mem _ _).1 (submonoid.closure_mono (set.singleton_subset_iff.2 H₄))),
-
+  { intro h,
+    rcases prop_2 hzero with ⟨P, ⟨hP, hP₂⟩⟩,
+    have hP₃ : P ≠ 0,
+    { intro h₂,
+      have ha₂ : a ∈ ideal.span {a},
+      { rw ideal.mem_span_singleton',
+        use 1,
+        rw one_mul },
+      rw [h₂, ideal.zero_eq_bot, ← ideal.span_zero] at hP₂,
+      rw [((hP₂ (ideal.span {a}) h) ((ideal.span_singleton_le_iff_mem (ideal.span {a})).2
+        (ideal.zero_mem (ideal.span {a})))), ideal.span_zero] at ha₂,
+      exact ha (ideal.mem_bot.1 ha₂) },
+    rcases ((H P) hP₃ (theo3 hP hP₂)) with ⟨x, ⟨H₃, H₄⟩⟩,
+    have hx : x ∉ S,
+    { intro h₂,
+      have h₃ : x ∈ (P : set R) ∩ S := ⟨(set_like.mem_coe.1 H₃), (set_like.mem_coe.1 h₂)⟩,
+      rw (foo_def _ _).1 hP at h₃,
+      exact (set.mem_empty_iff_false x).1 h₃ },
+    exact hx ((submonoid.closure_singleton_le_iff_mem _ _).1
+      (submonoid.closure_mono (set.singleton_subset_iff.2 H₄))) },
   rw [foo_def, ← ne.def] at ha₂,
   rcases set.nonempty_iff_ne_empty.2 ha₂ with ⟨x, ⟨hx, hx₂⟩⟩,
   cases ideal.mem_span_singleton'.1 (set_like.mem_coe.1 hx) with b hb,
-  rw ← hb at hx₂,
-
-  cases submonoid.closure_exists_multiset hx₂ with hab hab₂,
-  rcases hab with ⟨n, f, hf, ⟨hf₂, hab⟩⟩,
-  induction n with d hd generalizing f b x,
-  {
-    rw zero_add at hf,
-    cases multiset.card_eq_one.1 hf with y hy,
-    rw [hy, multiset.prod_singleton _] at hab,
-    rw hy at hf₂,
-    specialize hf₂ y (multiset.mem_singleton_self _),
-    have hf₃ := prime.irreducible hf₂,
-    rw ← hab at hf₃,
-    cases of_irreducible_mul hf₃,
-
-    rw mul_comm _ _ at hab,
-    have hab₂ : associated y (y * ring.inverse b),
-    use ring.inverse b,
-    exact b,
-    exact ring.inverse_mul_cancel _ h,
-    exact ring.mul_inverse_cancel _ h,
-    refl,
-    rw ← (ring.eq_mul_inverse_iff_mul_eq _ _ _ h).2 hab at hab₂,
-    exact submonoid.subset_closure ((hab₂.prime_iff).1 hf₂),
-
-    exfalso,
-    exact haunit h,
-  },
-  {
-    classical,
-    by_cases h : ∃ (p : R), p ∈ f ∧ p ∣ b,
-
-    rcases h with ⟨p, ⟨hp₁, hp₂⟩⟩,
-    cases dvd_iff_exists_eq_mul_left.1 hp₂ with c hp₂,
-    rw [hp₂, ← multiset.prod_erase hp₁, mul_comm c p, mul_assoc _ _ _] at hab,
-    replace hab := is_domain.mul_left_cancel_of_ne_zero (prime.ne_zero (hf₂ p hp₁)) hab,
-    have ha₃ : (f.erase p).prod ∈ (ideal.span {a}) :=
-    begin
-      rw ← hab,
-      rw ideal.mem_span_singleton',
-      use c,
-    end,
-    have ha₄ : c * a ∈ ↑S :=
-    begin
-      rw [submonoid.closure_eq_image_prod _, set.mem_image _ _ _],
-      refine ⟨((f.erase p).to_list), set.mem_set_of.1 (λ y hy, hf₂ y (multiset.mem_of_le (f.erase_le p) (multiset.mem_to_list.1 hy))), _⟩,
-      rw multiset.prod_to_list _,
-      exact eq.symm hab,
-    end,
-    have ha₅ : multiset.card (f.erase p) = d + 1 := sorry,
-    have ha₆ : ∀ (y : R), y ∈ f.erase p → prime y := λ y hy, hf₂ y ((multiset.mem_of_le (multiset.erase_le _ _)) hy),
-    exact hd (f.erase p) c (f.erase p).prod ha₃ hab ha₄ ha₅ ha₆ hab,
-
-    have ha₇ : f.prod ∣ a :=
-    begin
-      refine multiset.prod_primes_dvd _ hf₂ _ _,
-      rintro p hp,
-      sorry,
-      sorry,
-    end,
-    sorry,
-  },
-
-  exfalso,
-  rw mul_comm at hab₂,
-  exact haunit (is_unit_of_mul_eq_one _ _ hab₂),
+  rw [← hb, mul_comm] at hx₂,
+  have absorbing := primes_mem_mul R,
+  rw [submonoid.absorbing_iff_of_comm] at absorbing,
+  obtain ⟨z, hzmem, hass⟩ := (absorbing _ _ hx₂),
+  obtain ⟨m, hprime, hprod⟩ := submonoid.exists_multiset_of_mem_closure hzmem,
+  refine ⟨m, λ y hy, hprime _ hy, _⟩,
+  rwa [hprod, associated.comm],
 end
 
 theorem theo1' : unique_factorization_monoid R ↔
