@@ -20,7 +20,7 @@ theorem P_neq_top (hP : P ∈ foo S) : P ≠ ⊤ := λ h, ((set.disjoint_left.1 
 
 include hmax
 
-lemma gt_inter {I : ideal R} (h : P < I) : (I : set R) ∩ S ≠ ∅ := λ h₂, (lt_iff_le_and_ne.1 h).2 (eq.symm ((hmax I) h₂ (lt_iff_le_and_ne.1 h).1))
+lemma gt_inter {I : ideal R} (h : P < I) : ∃ (x : R), x ∈ (I : set R) ∩ S := set.inter_nonempty.1 (set.nonempty_iff_ne_empty.2 (λ h₂, (lt_iff_le_and_ne.1 h).2 (eq.symm ((hmax I) h₂ (lt_iff_le_and_ne.1 h).1))))
 
 include hP
 
@@ -33,7 +33,7 @@ begin
   let I := P ⊔ ideal.span {x},
   let J := P ⊔ ideal.span {y},
 
-  have h₁ : (I : set R) ∩ S ≠ ∅ :=
+  have h₁ : ∃ (x : R), x ∈ (I : set R) ∩ S :=
   begin
     refine gt_inter hmax (lt_of_le_of_ne' le_sup_left _),
     intro hI,
@@ -41,7 +41,7 @@ begin
     exact h' le_sup_right,
   end,
 
-  have h₂ : (J : set R) ∩ S ≠ ∅ :=
+  have h₂ : ∃ (x : R), x ∈ (J : set R) ∩ S :=
   begin
     refine gt_inter hmax (lt_of_le_of_ne' le_sup_left _),
     intro hJ,
@@ -49,37 +49,18 @@ begin
     exact h'' le_sup_right,
   end,
 
-  rcases (set.inter_nonempty.1 (set.nonempty_iff_ne_empty.2 h₁)) with ⟨s, ⟨h₅, h₆⟩⟩,
-  rcases (set.inter_nonempty.1 (set.nonempty_iff_ne_empty.2 h₂)) with ⟨t, ⟨h₇, h₈⟩⟩,
+  rcases ⟨h₁, h₂⟩ with ⟨⟨s, ⟨hs, hs'⟩⟩, ⟨t, ⟨ht, ht'⟩⟩⟩,
 
-  have h₉ : s*t ∈ I*J := ideal.mul_mem_mul h₅ h₇,
-  rw [ideal.mul_sup _ _ _, ideal.sup_mul _ _ _, ideal.sup_mul _ _ _] at h₉,
-
-  have h₁₀ : ideal.span {x} * ideal.span {y} ≤ P :=
+  have h₃ : I*J ≤ P :=
   begin
-    refine ideal.span_singleton_mul_le_iff.2 (λ z hz, _),
-    cases (ideal.mem_span_singleton'.1 hz) with a ha,
-    rw [← ha, ← mul_assoc _ _ _, mul_comm x a, mul_assoc _ _ _],
-    exact ideal.mul_mem_left _ _ hxy,
+    rw [ideal.mul_sup _ _ _, ideal.sup_mul _ _ _, ideal.sup_mul _ _ _, ideal.span_singleton_mul_span_singleton],
+    exact sup_le (sup_le ideal.mul_le_right ideal.mul_le_left) (sup_le ideal.mul_le_right ((ideal.span_singleton_le_iff_mem _).2 hxy)),
   end,
 
-  have h₁₁ : P * P ⊔ ideal.span {x} * P ⊔ (P * ideal.span {y} ⊔ ideal.span {x} * ideal.span {y}) ≤ P := sup_le (sup_le ideal.mul_le_right ideal.mul_le_left) (sup_le ideal.mul_le_right h₁₀),
-
-  have h₁₂ : s*t ∈ (P : set R) ∩ S := set.mem_inter (h₁₁ h₉) (submonoid.mul_mem S h₆ h₈),
-
-  have h₁₃ : (P : set R) ∩ S ≠ ∅ := λ h₁₄, ((set.eq_empty_iff_forall_not_mem.1 h₁₄) (s*t)) h₁₂,
-
-  contradiction,
+  exact set.eq_empty_iff_forall_not_mem.1 hP (s*t) ⟨h₃ (ideal.mul_mem_mul hs ht), S.mul_mem hs' ht'⟩,
 end
 
-theorem theo3 : P.is_prime :=
-begin
-  fconstructor,
-  refine P_neq_top hP,
-  apply mem_or_mem',
-  exact hP,
-  exact hmax,
-end
+theorem theo3 : P.is_prime := ⟨P_neq_top hP, λ x y, mem_or_mem' hP hmax⟩
 
 end basic
 
