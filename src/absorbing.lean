@@ -29,7 +29,22 @@ end basic
 section comm_monoid
 
 lemma absorbing_iff_of_comm {S : submonoid M} :
-  absorbing S ↔ ∀ x y, x * y ∈ S → ∃ z ∈ S, associated x z := sorry
+  absorbing S ↔ ∀ x y, x * y ∈ S → ∃ z ∈ S, associated x z :=
+begin
+  refine ⟨_, _⟩,
+
+  { rintro hS x y hxy,
+    rcases (hS x y hxy) with ⟨z, hz, hz₂, hS⟩,
+    exact ⟨z, hz, hz₂⟩ },
+
+  {
+    rintro h x y hxy,
+    obtain ⟨z, hz, hz₂⟩ := (h x y hxy),
+    refine ⟨z, hz, hz₂, _⟩,
+
+    rw mul_comm at hxy,
+    exact (h y x hxy) },
+end
 
 end comm_monoid
 
