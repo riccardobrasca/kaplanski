@@ -158,43 +158,39 @@ begin
   intros a b hab,
   obtain ⟨m, hm⟩ := submonoid.exists_multiset_of_mem_closure hab,
   revert hm a b,
-  apply multiset.strong_induction_on m,
+  apply m.strong_induction_on,
+
   rintros s hind b a hab ⟨hprime, hprod⟩,
-  simp at *,
-  rcases multiset.empty_or_exists_mem s with (hempty | ⟨i, hi⟩),
+  rcases s.empty_or_exists_mem with (hempty | ⟨i, hi⟩),
   { simp [hempty] at hprod,
-    refine ⟨1, submonoid.one_mem _, _⟩,
-    rw [associated_one_iff_is_unit],
-    exact is_unit_of_mul_eq_one _ _ (hprod.symm) },
-  rw [← multiset.cons_erase hi, multiset.prod_cons] at hprod,
+    exact ⟨1, submonoid.one_mem _, associated_one_of_mul_eq_one _ hprod.symm⟩ },
+
+  rw [← multiset.prod_erase hi] at hprod,
   rcases (hprime i hi).dvd_or_dvd ⟨(s.erase i).prod, hprod.symm⟩ with (⟨x, hxb⟩ | ⟨x, hxa⟩),
+
   { suffices : ∃ z ∈ submonoid.closure (primes R), associated x z,
     { obtain ⟨z, hz, hzx⟩ := this,
       refine ⟨z * i, submonoid.mul_mem _ hz (submonoid.subset_closure (hprime _ hi)), _⟩,
       rw [hxb, mul_comm z i],
       exact associated.mul_left i hzx },
-    rw [hxb, mul_assoc, mul_eq_mul_left_iff] at hprod,
-    cases hprod,
-    { have hxamem : x * a ∈ submonoid.closure (primes R),
-      { rw [← hprod],
-        refine submonoid.multiset_prod_mem _ _ (λ x hx, submonoid.subset_closure (hprime _ _)),
-        exact multiset.erase_subset _ _ hx },
-      obtain ⟨z, hz⟩ := hind (s.erase i) (multiset.erase_lt.2 hi) _ _ hxamem
-        (λ y hy, hprime _ (multiset.erase_subset _ _ hy)) hprod,
-      exact ⟨z, hz.1, hz.2⟩ },
-    { exfalso,
-      exact (hprime _ hi).ne_zero hprod } },
-  { rw [hxa, ← mul_assoc, mul_comm b i, mul_assoc, mul_eq_mul_left_iff] at hprod,
-    cases hprod,
-    { have hbxmem : b * x ∈ submonoid.closure (primes R),
-      { rw [← hprod],
-        refine submonoid.multiset_prod_mem _ _ (λ x hx, submonoid.subset_closure (hprime _ _)),
-        exact multiset.erase_subset _ _ hx },
-      obtain ⟨z, hz⟩ := hind (s.erase i) (multiset.erase_lt.2 hi) _ _ hbxmem
-        (λ y hy, hprime _ (multiset.erase_subset _ _ hy)) hprod,
-      refine ⟨z, hz.1, hz.2⟩ },
-    { exfalso,
-      exact (hprime _ hi).ne_zero hprod } }
+
+    rw [hxb, mul_assoc] at hprod,
+    replace hprod := (is_domain.mul_left_cancel_of_ne_zero (hprime _ hi).ne_zero hprod),
+
+    have hxamem : x * a ∈ submonoid.closure (primes R),
+    { rw [← hprod],
+      exact submonoid.multiset_prod_mem _ _ (λ x hx, submonoid.subset_closure (hprime _ (multiset.erase_subset _ _ hx))) },
+
+    exact hind (s.erase i) (multiset.erase_lt.2 hi) _ _ hxamem ⟨λ y hy, hprime y ((s.erase_subset _) hy), hprod⟩ },
+
+  { rw [hxa, ← mul_assoc, mul_comm b i, mul_assoc] at hprod,
+    replace hprod := (is_domain.mul_left_cancel_of_ne_zero (hprime i hi).ne_zero hprod),
+
+    have hbxmem : b * x ∈ submonoid.closure (primes R),
+    { rw [← hprod],
+      exact submonoid.multiset_prod_mem _ _ (λ x hx, submonoid.subset_closure (hprime _ (multiset.erase_subset _ _ hx))) },
+
+    exact hind (s.erase i) (multiset.erase_lt.2 hi) _ _ hbxmem ⟨λ y hy, hprime y ((s.erase_subset _) hy), hprod⟩ },
 end
 
 variable {R}
