@@ -22,7 +22,10 @@ variable (N)
 lemma top_absorbing : (⊤ : submonoid M).absorbing :=
   λ x y hxy, ⟨x, submonoid.mem_top _, associated.refl _, y, submonoid.mem_top _, associated.refl _⟩
 
-lemma bot_absorbing : (⊥ : submonoid M).absorbing := λ x y hxy, ⟨1, (⊥ : submonoid M).one_mem, associated_one_of_mul_eq_one _ (submonoid.mem_bot.1 hxy), 1, (⊥ : submonoid M).one_mem, associated_one_of_mul_eq_one _ (submonoid.mem_bot.1 (by rwa mul_comm at hxy))⟩
+lemma bot_absorbing : (⊥ : submonoid M).absorbing :=
+  λ x y hxy, ⟨1, (⊥ : submonoid M).one_mem,
+  associated_one_of_mul_eq_one _ (submonoid.mem_bot.1 hxy), 1, (⊥ : submonoid M).one_mem,
+  associated_one_of_mul_eq_one _ (submonoid.mem_bot.1 (by rwa mul_comm at hxy))⟩
 
 lemma is_unit.submonoid_absorbing : (is_unit.submonoid M).absorbing :=
   λ x y hxy, ⟨x, is_unit_of_mul_is_unit_left hxy, associated.refl _,
@@ -37,7 +40,8 @@ begin
   cases u.is_unit.exists_right_inv with b hb,
   rw [prod.mul_def, prod.mk_eq_one] at hb,
   rw [← hu, prod.fst_mul, prod.snd_mul],
-  refine ⟨(associated_mul_is_unit_right_iff (is_unit_of_mul_eq_one _ _ hb.1)).2 (associated.refl _), (associated_mul_is_unit_right_iff  (is_unit_of_mul_eq_one _ _ hb.2)).2 (associated.refl _)⟩,
+  refine ⟨(associated_mul_is_unit_right_iff (is_unit_of_mul_eq_one _ _ hb.1)).2 (associated.refl _),
+  (associated_mul_is_unit_right_iff (is_unit_of_mul_eq_one _ _ hb.2)).2 (associated.refl _)⟩,
 end
 
 lemma submonoid.prod_absorbing (s : submonoid M) (t : submonoid N) :
