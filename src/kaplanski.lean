@@ -72,27 +72,22 @@ lemma condition_Zorns_lemma (C : set (ideal R)) (hC : C ⊆ foo S)
   (∃ (P : ideal R) (H : P ∈ foo S), ∀ (J : ideal R), J ∈ C → J ≤ P) :=
 begin
   refine ⟨Sup C, _, λ z hz, le_Sup hz⟩,
-  by_contra,
-  rw [foo_def, ← set.not_nonempty_iff_eq_empty] at h,
-  push_neg at h,
-  rcases h with ⟨x, hx₁, hx₂⟩,
-  rcases (submodule.mem_Sup_of_directed ⟨_, hI⟩ hC₂.directed_on).1 hx₁ with ⟨J, hJ₁, hJ₂⟩,
-  have hx₄ : (J : set R) ∩ S ≠ ∅,
-  { rw [← set.nonempty_iff_ne_empty],
-    exact ⟨x, hJ₂, hx₂⟩ },
-  exact hx₄ (hC hJ₁),
+  rw [foo_def, set.eq_empty_iff_forall_not_mem],
+  rintro x hx,
+  rcases (submodule.mem_Sup_of_directed ⟨_, hI⟩ hC₂.directed_on).1 hx.1 with ⟨J, hJ₁, hJ₂⟩,
+  have hx₂ : (J : set R) ∩ S ≠ ∅ := set.nonempty_iff_ne_empty.1 ⟨x, hJ₂, hx.2⟩,
+  exact hx₂ (hC hJ₁),
 end
 
 lemma prop_2 (hS : (0 : R) ∉ S) : ∃ P ∈ foo S,  ∀ I ∈ foo S, P ≤ I → I = P :=
 begin
-  set x : ideal R := 0 with hx,
-  have hx : x ∈ foo S,
+  have hx : (0 : ideal R) ∈ foo S,
   { rw [foo_def, set.eq_empty_iff_forall_not_mem],
     rintro y ⟨hy₁, hy₂⟩,
-    rw [hx, set_like.mem_coe, ideal.zero_eq_bot, ideal.mem_bot] at hy₁,
+    rw [set_like.mem_coe, ideal.zero_eq_bot, ideal.mem_bot] at hy₁,
     rw hy₁ at hy₂,
     exact hS hy₂ },
-  rcases zorn_nonempty_partial_order₀ (foo S) condition_Zorns_lemma x hx with
+  rcases zorn_nonempty_partial_order₀ _ condition_Zorns_lemma 0 hx with
     ⟨J, ⟨hJ, ⟨hJ₂, hJ₃⟩⟩⟩,
   exact ⟨J, hJ, hJ₃⟩,
 end
