@@ -27,7 +27,13 @@ lemma is_unit.submonoid_absorbing : (is_unit.submonoid M).absorbing := λ x y hx
 
 lemma associated.prod (x : M × N) (z : M × N) : associated x z ↔ associated x.1 z.1 ∧ associated x.2 z.2 :=
 begin
-  sorry,
+  refine ⟨_, λ ⟨⟨u₁, hu₁⟩, ⟨u₂, hu₂⟩⟩, ⟨mul_equiv.prod_units.inv_fun (u₁, u₂), prod.eq_iff_fst_eq_snd_eq.2 ⟨hu₁, hu₂⟩⟩⟩,
+
+  rintro ⟨u, hu⟩,
+  cases u.is_unit.exists_right_inv with b hb,
+  rw [prod.mul_def, prod.mk_eq_one] at hb,
+  rw [← hu, prod.fst_mul, prod.snd_mul],
+  refine ⟨(associated_mul_is_unit_right_iff  (is_unit_of_mul_eq_one _ _ hb.1)).2 (associated.refl _), (associated_mul_is_unit_right_iff  (is_unit_of_mul_eq_one _ _ hb.2)).2 (associated.refl _)⟩,
 end
 
 lemma submonoid.prod_absorbing (s : submonoid M) (t : submonoid N) : (s.prod t).absorbing ↔ absorbing s ∧ absorbing t :=
