@@ -190,69 +190,6 @@ end
 
 variable {R}
 
-lemma unique_factorization_monoid_of_factorization
-  (H : ∀ (r : R), r ≠ 0 → ¬(is_unit r) →  r ∈ submonoid.closure (primes R)) :
-  unique_factorization_monoid R :=
-begin
-  apply unique_factorization_monoid.of_exists_prime_factors,
-  intros a ha,
-  specialize H a ha,
-  by_cases  hu : is_unit a,
-  { use ∅,
-    split,
-    { intros b hb,
-      exfalso,
-      simpa using hb },
-    { simp,
-      rw [associated.comm],
-      exact associated_one_iff_is_unit.2 hu } },
-  { specialize H hu,
-    rcases submonoid.exists_multiset_of_mem_closure H with ⟨M, hM, hMprod⟩,
-    use M,
-    split,
-    { intros b hb,
-      exact hM b hb },
-    { rw [hMprod], } }
-end
-
-lemma submonoid.closure_exists_multiset {x : R} (hx : x ∈ submonoid.closure (primes R)): (∃ (n : ℕ) (f : multiset R) (hf : f.card = n + 1), (∀ (y : R), y ∈ f → prime y) ∧ x = f.prod) ∨ x = 1 :=
-begin
-  apply submonoid.closure_induction hx _ _,
-
-  rintro x y h₁ h₂,
-  rcases h₁ with ⟨n, ⟨f₁, hf₁, ⟨hf₂, hf₃⟩⟩⟩,
-  rcases h₂ with ⟨m, ⟨g₁, hg₁, ⟨hg₂, hg₃⟩⟩⟩,
-  use n + m + 1,
-  use f₁ + g₁,
-  refine ⟨_, λ y hy, _, _⟩,
-  rw [multiset.card_add _ _, hf₁, hg₁],
-  ring,
-  cases multiset.mem_add.1 hy with hy₁ hy₂,
-  exact hf₂ y hy₁,
-  exact hg₂ y hy₂,
-  rw [multiset.prod_add _ _, hf₃, hg₃],
-
-  left,
-  rw [h₂, mul_one _],
-  exact ⟨n, f₁, hf₁, hf₂, hf₃⟩,
-
-  rw [h₁, one_mul _],
-  rcases h₂ with ⟨m, ⟨g₁, hg₁, ⟨hg₂, hg₃⟩⟩⟩,
-  left,
-  exact ⟨m, g₁, hg₁, hg₂, hg₃⟩,
-  right,
-  exact h₂,
-
-  rintro z hz,
-  left,
-  refine ⟨0, {z}, multiset.card_singleton _, λ y hy, _, eq.symm (multiset.prod_singleton _)⟩,
-  rw ← multiset.mem_singleton.1 hy at hz,
-  exact hz,
-
-  right,
-  refl,
-end
-
 theorem theo1_gauche (H : ∀ (I : ideal R) (hI : I ≠ 0) (hI₂ : I.is_prime), ∃ x ∈ I, prime x) :
   unique_factorization_monoid R :=
 begin
