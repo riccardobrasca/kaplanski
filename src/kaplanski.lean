@@ -4,7 +4,7 @@ import ring_theory.ideal.operations
 import data.set.basic
 import ring_theory.unique_factorization_domain
 import ring_theory.principal_ideal_domain
-import import absorbing
+import absorbing
 
 variables {R : Type*} [comm_ring R] (S : submonoid R)
 
