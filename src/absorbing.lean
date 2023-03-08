@@ -47,22 +47,17 @@ end
 lemma submonoid.prod_absorbing (s : submonoid M) (t : submonoid N) :
   (s.prod t).absorbing ↔ absorbing s ∧ absorbing t :=
 begin
-  refine ⟨_, _⟩,
-  { intro h,
-    refine ⟨_, _⟩,
-    { rintro x y hxy,
-      specialize h (x,1) (y,1),
-      rw prod.mk_one_mul_mk_one at h,
-      rcases (h (submonoid.mem_prod.2 ⟨hxy, t.one_mem⟩)) with ⟨a, ha, ha₂, ⟨b, hb, hb₂⟩⟩,
-      exact ⟨a.1, (submonoid.mem_prod.1 ha).1, ((associated.prod _ _ _ _).1 ha₂).1,
+  refine ⟨λ h, ⟨λ x y hxy, _, λ x y hxy, _⟩ , _⟩,
+  { specialize h (x,1) (y,1),
+    rw prod.mk_one_mul_mk_one at h,
+    rcases (h (submonoid.mem_prod.2 ⟨hxy, t.one_mem⟩)) with ⟨a, ha, ha₂, ⟨b, hb, hb₂⟩⟩,
+    exact ⟨a.1, (submonoid.mem_prod.1 ha).1, ((associated.prod _ _ _ _).1 ha₂).1,
       b.1, (submonoid.mem_prod.1 hb).1, ((associated.prod _ _ _ _).1 hb₂).1⟩ },
-    { rintro x y hxy,
-      specialize h (1,x) (1,y),
-      rw prod.one_mk_mul_one_mk at h,
-      rcases (h (submonoid.mem_prod.2 ⟨s.one_mem, hxy⟩)) with ⟨a, ha, ha₂, ⟨b, hb, hb₂⟩⟩,
-      exact ⟨a.2, (submonoid.mem_prod.1 ha).2, ((associated.prod _ _ _ _).1 ha₂).2,
-      b.2, (submonoid.mem_prod.1 hb).2, ((associated.prod _ _ _ _).1 hb₂).2⟩ } },
-
+  { specialize h (1,x) (1,y),
+    rw prod.one_mk_mul_one_mk at h,
+    rcases (h (submonoid.mem_prod.2 ⟨s.one_mem, hxy⟩)) with ⟨a, ha, ha₂, ⟨b, hb, hb₂⟩⟩,
+    exact ⟨a.2, (submonoid.mem_prod.1 ha).2, ((associated.prod _ _ _ _).1 ha₂).2,
+      b.2, (submonoid.mem_prod.1 hb).2, ((associated.prod _ _ _ _).1 hb₂).2⟩ },
   { rintro ⟨hs, ht⟩ x y hxy,
     rcases (hs x.1 y.1 hxy.1) with ⟨z, hz, hz₂, ⟨z', hz', hz'₂⟩⟩,
     rcases (ht x.2 y.2 hxy.2) with ⟨w, hw, hw₂, ⟨w', hw', hw'₂⟩⟩,
@@ -77,15 +72,12 @@ section comm_monoid
 lemma absorbing_iff_of_comm {S : submonoid M} :
   absorbing S ↔ ∀ x y, x * y ∈ S → ∃ z ∈ S, associated x z :=
 begin
-  refine ⟨_, _⟩,
+  refine ⟨λ hS x y hxy, _, λ h x y hxy, _⟩,
 
-  { rintro hS x y hxy,
-    rcases (hS x y hxy) with ⟨z, hz, hz₂, hS⟩,
+  { rcases (hS x y hxy) with ⟨z, hz, hz₂, hS⟩,
     exact ⟨z, hz, hz₂⟩ },
 
-  {
-    rintro h x y hxy,
-    obtain ⟨z, hz, hz₂⟩ := (h x y hxy),
+  { obtain ⟨z, hz, hz₂⟩ := (h x y hxy),
     refine ⟨z, hz, hz₂, _⟩,
 
     rw mul_comm at hxy,
