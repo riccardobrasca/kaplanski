@@ -8,6 +8,7 @@ import absorbing
 
 variables {R : Type*} [comm_ring R] (S : submonoid R)
 
+/-- Explication -/
 def foo := {I : ideal R | (I : set R) ∩ S = ∅}
 
 lemma foo_def (P : ideal R) : P ∈ foo S ↔ (P : set R) ∩ S = ∅ :=
@@ -96,9 +97,7 @@ end existence
 
 section Kaplansky
 
-variables [is_domain R]
-
-lemma multiset.prod_mem_ideal [unique_factorization_monoid R] {I : ideal R} (s : multiset R) (hI : I.is_prime) : s.prod ∈ I ↔ ∃ (p : R) (H : p ∈ s), p ∈ I :=
+lemma multiset.prod_mem_ideal {I : ideal R} (s : multiset R) (hI : I.is_prime) : s.prod ∈ I ↔ ∃ (p : R) (H : p ∈ s), p ∈ I :=
 begin
   classical,
   split,
@@ -122,6 +121,15 @@ begin
     exact ideal.mul_mem_right _ _ hs₃, },
 end
 
+variable (R)
+
+/-- The set of prime elements. -/
+def primes := {r : R | prime r}
+
+variables [is_domain R]
+
+variable {R}
+
 theorem theo1_droite [unique_factorization_monoid R] {I : ideal R} (hI : nontrivial I) (hI₂ : I.is_prime) :
   ∃ x ∈ I, prime x :=
 begin
@@ -143,8 +151,6 @@ begin
 end
 
 variable (R)
-
-def primes := {r : R | prime r}
 
 lemma primes_mem_mul : (submonoid.closure (primes R)).absorbing :=
 begin
