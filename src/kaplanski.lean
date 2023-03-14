@@ -130,15 +130,11 @@ variables [is_domain R]
 
 variable {R}
 
-theorem theo1_droite [unique_factorization_monoid R] {I : ideal R} (hI : nontrivial I) (hI₂ : I.is_prime) :
+theorem theo1_droite [unique_factorization_monoid R] {I : ideal R} (hI : I ≠ ⊥) (hI₂ : I.is_prime) :
   ∃ x ∈ I, prime x :=
 begin
   classical,
-  have ha : ∃ (a : R), a ∈ I ∧ a ≠ 0,
-  cases exists_ne (0 : I) with y hI₃,
-  refine ⟨y, y.2, _⟩,
-  rw [ne.def, subtype.ext_iff_val] at hI₃,
-  exact hI₃,
+  have ha : ∃ (a : R), a ∈ I ∧ a ≠ 0 := submodule.exists_mem_ne_zero_of_ne_bot hI,
 
   rcases ha with ⟨a, ⟨ha₁, ha₂⟩⟩,
   cases (unique_factorization_monoid.factors_prod ha₂) with u ha₃,
@@ -196,7 +192,7 @@ end
 
 variable {R}
 
-theorem theo1_gauche (H : ∀ (I : ideal R) (hI : I ≠ 0) (hI₂ : I.is_prime), ∃ x ∈ I, prime x) :
+theorem theo1_gauche (H : ∀ (I : ideal R) (hI : I ≠ ⊥) (hI₂ : I.is_prime), ∃ x ∈ I, prime x) :
   unique_factorization_monoid R :=
 begin
   let S := submonoid.closure (primes R),
