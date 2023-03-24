@@ -48,27 +48,37 @@ theorem is_unit_of_is_unit_of_is_nilpotent {P : R[X]} (hunit : is_unit (P.coeff 
 begin
   induction h : P.nat_degree using nat.strong_induction_on with k hind generalizing P,
   by_cases hdeg : P.nat_degree = 0,
-  {
-    have hCunit : is_unit (C (P.coeff 0)) := is_unit.map C hunit,
+  { have hCunit : is_unit (C (P.coeff 0)) := is_unit.map C hunit,
     rw polynomial.eq_C_of_nat_degree_eq_zero hdeg,
-    apply hCunit,
-  },
+    apply hCunit },
   let P₁ := P.erase_lead,
   suffices : is_unit P₁,
-  { sorry },
-  have hdeg : P₁.nat_degree < k,
+  { rw [← erase_lead_add_monomial_nat_degree_leading_coeff P],
+    apply is_unit_of_is_unit_add_is_nilpotent this _,
+    rw [← C_mul_X_pow_eq_monomial],
+    apply is_nilpotent.C_mul_X_pow,
+    apply hnil,
+    exact hdeg },
+  have hdegk : P₁.nat_degree < k,
   { rw [← h],
-    sorry /-ça doit être dans mathlib-/ },
+    apply lt_of_le_of_lt (erase_lead_nat_degree_le P),
+    rw [← nat.pred_eq_sub_one],
+    exact nat.pred_lt hdeg },
   have hP₁unit : is_unit (P₁.coeff 0),
-  {
-    sorry
-  },
+  { rw [erase_lead_coeff_of_ne],
+    { exact hunit },
+    { intro h,
+      exact hdeg h.symm } },
   have hP₁nilpotent : ∀ i ≠ 0, is_nilpotent (P₁.coeff i),
-  { --par disjonction de cas, si i ≤ P₁.nat_degree le coeff est le même
-    sorry
-  },
-  exact hind _ hdeg hP₁unit hP₁nilpotent rfl,
-  --have hCunit : is_unit (C (P.coeff 0)) := is_unit.map C hunit,
+  { intros i hi,
+    by_cases H : i ≤ P₁.nat_degree,
+    { rw [erase_lead_coeff_of_ne],
+      { exact hnil i hi },
+      { linarith } },
+    { rw [coeff_eq_zero_of_nat_degree_lt],
+      { exact is_nilpotent.zero },
+      { linarith } }},
+  exact hind _ hdegk hP₁unit hP₁nilpotent rfl,
 end
 
 theorem is_unit.coeff {P : R[X]} (hunit : is_unit P) :
