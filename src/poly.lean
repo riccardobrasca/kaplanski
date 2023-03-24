@@ -1,16 +1,35 @@
 import ring_theory.nilpotent
 import data.polynomial.erase_lead
+import algebra.geom_sum
 
 variables {R : Type*} [comm_ring R]
 
 open_locale polynomial big_operators
 
+open finset
+
+theorem is_unit_of_is_nilpotent_sub_one {r : R} (hnil : is_nilpotent r) :
+  is_unit (r - 1) :=
+begin
+  obtain ⟨n, hn⟩ := hnil,
+  rw [is_unit_iff_exists_inv],
+  use -(∑ i in range n, r ^ i),
+  rw [mul_neg, mul_comm, geom_sum_mul, hn],
+  simp
+end
+
 theorem is_unit_of_is_unit_add_is_nilpotent {u r : R} (hu : is_unit u) (hnil : is_nilpotent r) :
   is_unit (u + r) :=
 begin
-have hnil2 := hnil,
-rw is_nilpotent at hnil2,
---rw is_nilpotent at hnil,
+  obtain ⟨v, hv⟩ := is_unit.exists_right_inv hu,
+  suffices : is_unit (v * (u + r)),
+  { exact is_unit_of_mul_is_unit_right this },
+  rw [mul_add, mul_comm v u, hv],
+  replace hnil : is_nilpotent (-v * r),
+  { rw [← mem_nilradical] at ⊢ hnil,
+    exact (nilradical R).mul_mem_left (-v) hnil },
+  rw [← is_unit.neg_iff, neg_add, add_comm, ← sub_eq_add_neg, ← neg_mul],
+  exact is_unit_of_is_nilpotent_sub_one hnil
 end
 
 namespace polynomial
