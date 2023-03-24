@@ -28,7 +28,9 @@ begin
   induction h : P.nat_degree using nat.strong_induction_on with k hind generalizing P,
   by_cases hdeg : P.nat_degree = 0,
   {
-    sorry
+    have hCunit : is_unit (C (P.coeff 0)) := is_unit.map C hunit,
+    rw polynomial.eq_C_of_nat_degree_eq_zero hdeg,
+    apply hCunit,
   },
   let P₁ := P.erase_lead,
   suffices : is_unit P₁,
