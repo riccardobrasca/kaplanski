@@ -8,7 +8,9 @@ open_locale polynomial big_operators
 theorem is_unit_of_is_unit_add_is_nilpotent {u r : R} (hu : is_unit u) (hnil : is_nilpotent r) :
   is_unit (u + r) :=
 begin
-sorry
+have hnil2 := hnil,
+rw is_nilpotent at hnil2,
+--rw is_nilpotent at hnil,
 end
 
 namespace polynomial
