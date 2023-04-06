@@ -1,5 +1,6 @@
 import ring_theory.nilpotent
 import data.polynomial.erase_lead
+import data.polynomial.eval
 import algebra.geom_sum
 
 variables {R : Type*} [comm_ring R]
@@ -84,7 +85,16 @@ end
 theorem is_unit.coeff {P : R[X]} (hunit : is_unit P) :
   is_unit (P.coeff 0) ∧ (∀ i ≠ 0, is_nilpotent (P.coeff i)) :=
 begin
-  sorry
+  split,
+  {obtain ⟨Q, hQ⟩ := is_unit.exists_right_inv hunit,
+  let V := P * Q,
+  --let u := polynomial.constant_coeff (V),
+  have v1 : polynomial.constant_coeff (P * Q) = 1,
+  {rw hQ, sorry
+  --rw polynomial.coeff_C_zero,
+  }
+
+  }
 end
 
 theorem is_unit_iff (P : R[X]) : is_unit P ↔
