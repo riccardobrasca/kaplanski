@@ -95,10 +95,11 @@ begin
   },
   suffices : (polynomial.constant_coeff (P)) * (polynomial.constant_coeff (Q)) = 1,
   {
-    library_search!,
-  }
+    exact is_unit_of_mul_eq_one (coeff P 0) (constant_coeff Q) this,
+  },
   {
-
+    simp,
+    --polynomial.C_mul
   }
   }
 end
