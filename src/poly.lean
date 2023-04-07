@@ -90,10 +90,16 @@ begin
   let V := P * Q,
   --let u := polynomial.constant_coeff (V),
   have v1 : polynomial.constant_coeff (P * Q) = 1,
-  {rw hQ, sorry
-  --rw polynomial.coeff_C_zero,
+  {rw hQ,
+  rw polynomial.constant_coeff_apply, simp,
+  },
+  suffices : (polynomial.constant_coeff (P)) * (polynomial.constant_coeff (Q)) = 1,
+  {
+    library_search!,
   }
+  {
 
+  }
   }
 end
 
