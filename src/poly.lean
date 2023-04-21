@@ -98,8 +98,7 @@ begin
     exact is_unit_of_mul_eq_one (coeff P 0) (constant_coeff Q) this,
   },
   {
-    simp,
-    --polynomial.C_mul
+    simp at v1, simp, apply v1,
   }
   }
 end
