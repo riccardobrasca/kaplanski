@@ -2,6 +2,7 @@ import ring_theory.nilpotent
 import data.polynomial.erase_lead
 import data.polynomial.eval
 import algebra.geom_sum
+import data.polynomial.lifts
 
 variables {R : Type*} [comm_ring R]
 
@@ -85,22 +86,32 @@ end
 theorem is_unit.coeff {P : R[X]} (hunit : is_unit P) :
   is_unit (P.coeff 0) ∧ (∀ i ≠ 0, is_nilpotent (P.coeff i)) :=
 begin
+  obtain ⟨Q, hQ⟩ := is_unit.exists_right_inv hunit,
   split,
-  {obtain ⟨Q, hQ⟩ := is_unit.exists_right_inv hunit,
-  let V := P * Q,
-  --let u := polynomial.constant_coeff (V),
-  have v1 : polynomial.constant_coeff (P * Q) = 1,
-  {rw hQ,
-  rw polynomial.constant_coeff_apply, simp,
-  },
-  suffices : (polynomial.constant_coeff (P)) * (polynomial.constant_coeff (Q)) = 1,
-  {
-    exact is_unit_of_mul_eq_one (coeff P 0) (constant_coeff Q) this,
-  },
-  {
-    simp at v1, simp, apply v1,
-  }
-  }
+  { let V := P * Q, --let u := polynomial.constant_coeff (V),
+    have v1 : polynomial.constant_coeff (P * Q) = 1,
+    { rw hQ,
+      rw polynomial.constant_coeff_apply, simp },
+    suffices : (polynomial.constant_coeff (P)) * (polynomial.constant_coeff (Q)) = 1,
+    { exact is_unit_of_mul_eq_one (coeff P 0) (constant_coeff Q) this },
+    simp at v1, simp, apply v1 },
+  { intros n hn,
+    rw [nilpotent_iff_mem_prime],
+    intros I hI,
+    let f := polynomial.map_ring_hom (ideal.quotient.mk I),
+    have hPQ : (f P) * (f Q) = 1,
+    { rw [← map_mul, hQ, map_one] },
+    replace hPQ := congr_arg degree hPQ,
+    haveI : is_domain (R ⧸ I),
+    { rw [ideal.quotient.is_domain_iff_prime],
+      exact hI },
+    simp only [nat.with_bot.add_eq_zero_iff, degree_mul, degree_one] at hPQ,
+    have hcoeff : (f P).coeff n = 0,
+    { apply polynomial.coeff_eq_zero_of_degree_lt,
+      rw [hPQ.1, with_bot.coe_pos],
+      exact ne.bot_lt hn },
+    rw [coe_map_ring_hom, polynomial.coeff_map, ← ring_hom.mem_ker, ideal.mk_ker] at hcoeff,
+    exact hcoeff }
 end
 
 theorem is_unit_iff (P : R[X]) : is_unit P ↔
